@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>project-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <spring.version>5.2.12.RELEASE</spring.version>
+        <junit.version>4.13.1</junit.version>
+    </properties>
+
+    <!--
+        定义好当前的环境,采用不通的激活方式操作
+            1.使用命令行:mvn test -Ptest
+                第一个 test 为 Maven 生命周期阶段，第 2 个 test 为构建配置文件指定的 <id> 参数，这个参数通过 -P 来传输，当然，它可以是 prod 或者 normal 这些由你定义的<id>。
+            2.通过maven安装目录conf下的setting文件配置激活,增加<activeProfiles>
+                1.settings增加<activeProfiles>
+                    <activeProfiles>
+                      <activeProfile>test</activeProfile>
+                    </activeProfiles>
+                2.执行命令: mvn test
+            3.通过环境变量激活配置文件,执行命令: mvn test -Denv=test
+                1.pom里<profile>节点加入<activation>
+                    <activation>
+                        <property>
+                            <name>env</name>
+                            <value>test</value>
+                        </property>
+                    </activation>
+                    也可以在加上<activeByDefault>true</activeByDefault>,表示默认激活
+                2.执行命令: mvn test -Denv=test
+            4.通过操作系统激活配置文件
+            5.通过文件的存在或者缺失激活配置文件
+                1.加入
+                    <profile>
+                       <id>test</id>
+                       <activation>
+                          <file>
+                             <missing>target/generated-sources/axistools/wsdl2java/
+                             com/companyname/group</missing>
+                          </file>
+                       </activation>
+                    </profile>
+                 2.执行命令: mvn test
+    -->
+    <profiles>
+        <profile>
+            <id>test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>env</name>
+                    <value>test</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo>Using env.test.properties</echo>
+                                        <copy file="src/main/resources/env.test.properties"
+                                              tofile="${project.build.outputDirectory}/env.properties"
+                                              overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>normal</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>normal</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo>Using env.properties</echo>
+                                        <copy file="src/main/resources/env.properties"
+                                              tofile="${project.build.outputDirectory}/env.properties"
+                                              overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo>Using env.prod.properties</echo>
+                                        <copy file="src/main/resources/env.prod.properties"
+                                              tofile="${project.build.outputDirectory}/env.properties"
+                                              overwrite="true"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

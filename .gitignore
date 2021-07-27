@@ -1,6 +1,8 @@
 # ignore
 */.idea/
+*/target/
 */*/target/
+/*/*.iml
 
 # Compiled class file
 *.class
